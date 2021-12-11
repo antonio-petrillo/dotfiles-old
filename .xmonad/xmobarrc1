@@ -1,0 +1,30 @@
+Config { font = "xft:JetBrainsMono:pixelsize=12:antialias=true:hinting=true"
+     , additionalFonts = [ "xft:Font Awesome 5 Free:pixelsize=9"
+                         , "xft:mononoki Nerd Font:pixelsize=12:antialias=true:hinting=true"
+                         , "xft:Font Awesome 5 Brands:pixelsize=9:antialias=true:hinting=true"]
+     , borderColor = "black"
+     , border = TopB
+     , bgColor = "#23272e"
+     , fgColor = "#eceff4"
+     , alpha = 255
+     , position = Static {xpos = 0, ypos = 0, width = 1822, height = 24}
+     , textOffset = -1
+     , iconOffset = -1
+     , lowerOnStart = False
+     , pickBroadest = False
+     , persistent = True
+     , hideOnStart = False
+     , iconRoot = "/home/anto/.xmonad/xpm/" --default: "."
+     , allDesktops = True
+     , overrideRedirect = True
+     , commands = [ Run Network "eno1" ["-t", "<fc=#88c0d0><fn=2> \xf0ab </fn></fc> <rx>kb <fc=#88c0d0><fn=2>\xf0aa </fn></fc> <tx>kb"] 30
+                  , Run Cpu ["-t", "<fc=#88c0d0><fn=2> \xf108 </fn></fc>  cpu:<total>%", "-H", "50", "--high", "red"] 20
+                  , Run Memory ["-t","<fc=#88c0d0><fn=2> \xf233 </fn></fc>  mem: <used> MB"] 20
+                  , Run Com "uname" ["-s", "-r"] "" 36000 -- <fc=#88c0d0><fn=2>\xf17c</fn></fc>
+                  , Run Date "<fc=#88c0d0><fn=2>\xf133 </fn></fc>  %d %b %Y (%H:%M)" "date" 60 
+                  , Run UnsafeStdinReader 
+                  ]
+     , sepChar = "%"
+     , alignSep = "}{"
+     , template = "<action=`rofi -show drun`> <icon=haskell-ita.xpm/></action> <fc=#b48ead>|</fc> %UnsafeStdinReader% }{ <action=`alacritty -e sudo pacman -Syyu`><icon=linux.xpm/> %uname% </action> <fc=#b48ead>|</fc><action=`alacritty -e htop`>%cpu% </action><fc=#b48ead>|</fc><action=`alacritty -e htop`>%memory% </action><fc=#b48ead>|</fc><action=`alacritty -e nmtui`>%eno1%</action> <fc=#b48ead>|</fc><action=`alacritty -e calcurse`> %date% </action>"
+     }

@@ -1,0 +1,9 @@
+# key: <awk
+# name: awk script
+# --
+#+begin_src shell
+#!/usr/bin/awk -f
+
+$0
+
+#+end_src

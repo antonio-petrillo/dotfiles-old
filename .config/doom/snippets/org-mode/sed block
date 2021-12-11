@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name:sed block
+# key:<sed
+# --
+
+#+begin_src shell
+#!/usr/bin/env sed $0
+$1
+#+end_src

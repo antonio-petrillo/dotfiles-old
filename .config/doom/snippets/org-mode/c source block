@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: c source block
+# key: <cc
+# --
+
+#+begin_src c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char* argv[]){
+    $0
+    return 0;
+}
+#+end_src

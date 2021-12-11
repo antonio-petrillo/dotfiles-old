@@ -1,0 +1,13 @@
+* Emacs config
+For now I'm using [[https://github.com/hlissner/doom-emacs][doom emacs]] as my editor of choice, with a really simple configuration.
+Honestly I want to write my personal config from scratch, but first I need to learn some elisp (It isn't essential but help).
+* Xmonad
+MY config is inspired by [[https://gitlab.com/dwt1/dotfiles/-/tree/master/.xmonad][DT]] config and some other, for now is at the same time bloated and minimal, in the sense that there are a lot of unused layout, grid select, ecc... but at the same time I didn't configure some other stuff like the bluetooth, screenlock, ecc...
+* Dunst
+I just copied this config from someone else github ([[https://github.com/BrodieRobertson/dotfiles/tree/master/config/dunst][Brodie Robertson]]), I need just a notification manager.
+* Neovim
+It's been a while since I used frequently vim/nvim but I already have this config and didn't want to waste it.
+* Script
+Some random script that I wrote/use
+* Alacritty
+This is also stolen from [[https://gitlab.com/dwt1/dotfiles/-/tree/master/.config/alacritty][DT]].

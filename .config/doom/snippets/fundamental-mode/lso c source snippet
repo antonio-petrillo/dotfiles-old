@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# name: lso c source snippet
+# key: <lsoc
+# --
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <unistd.h>
+
+#include <sys/wait.h>
+
+int main(int argc, char* argv[]){
+    $0
+    return 0;
+}
