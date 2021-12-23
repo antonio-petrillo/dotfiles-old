@@ -1,43 +1,22 @@
 
-xmonad.hs:265:10: warning: [-Wdeprecations]
+xmonad.hs:242:10: warning: [-Wdeprecations]
     In the use of ‘spacing’ (imported from XMonad.Layout.Spacing):
     Deprecated: "Use spacingRaw instead."
     |
-265 |        $ spacing myGaps
+242 |        $ spacing myGaps
     |          ^^^^^^^
 
-xmonad.hs:275:11: warning: [-Wdeprecations]
+xmonad.hs:247:11: warning: [-Wdeprecations]
     In the use of ‘spacing’ (imported from XMonad.Layout.Spacing):
     Deprecated: "Use spacingRaw instead."
     |
-275 |         $ spacing myGaps 
+247 |         $ spacing myGaps
     |           ^^^^^^^
 
-xmonad.hs:296:8: warning: [-Wdeprecations]
-    In the use of ‘spacing’ (imported from XMonad.Layout.Spacing):
-    Deprecated: "Use spacingRaw instead."
-    |
-296 |      $ spacing myGaps
-    |        ^^^^^^^
-
-xmonad.hs:309:11: warning: [-Wdeprecations]
-    In the use of ‘spacing’ (imported from XMonad.Layout.Spacing):
-    Deprecated: "Use spacingRaw instead."
-    |
-309 |         $ spacing myGaps
-    |           ^^^^^^^
-
-xmonad.hs:316:11: warning: [-Wdeprecations]
-    In the use of ‘spacing’ (imported from XMonad.Layout.Spacing):
-    Deprecated: "Use spacingRaw instead."
-    |
-316 |         $ spacing myGaps
-    |           ^^^^^^^
-
-xmonad.hs:336:12: warning: [-Wdeprecations]
+xmonad.hs:294:12: warning: [-Wdeprecations]
     In the use of ‘defaultConfig’
     (imported from XMonad, but defined in XMonad.Config):
     Deprecated: "Use def (from Data.Default, and re-exported by XMonad and XMonad.Config) instead."
     |
-336 | myConfig = defaultConfig {
+294 | myConfig = defaultConfig {
     |            ^^^^^^^^^^^^^

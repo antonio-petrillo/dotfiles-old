@@ -7,24 +7,30 @@ Config { font = "xft:JetBrainsMono:pixelsize=12:antialias=true:hinting=true"
      , bgColor = "#23272e"
      , fgColor = "#eceff4"
      , alpha = 255
-     , position = Static {xpos = 0, ypos = 0, width = 1822, height = 24}
+     , position = Static {xpos = 1920, ypos = 0, width = 1920, height = 24} -- config for 2 monitor
+--     , position = Static {xpos = 0, ypos = 0, width = 1920, height = 24}    -- config for 1 monitor
      , textOffset = -1
      , iconOffset = -1
      , lowerOnStart = False
      , pickBroadest = False
      , persistent = True
      , hideOnStart = False
-     , iconRoot = "/home/anto/.xmonad/xpm/" --default: "."
+     , iconRoot = "/home/anto/.xmonad/xpm/"
      , allDesktops = True
      , overrideRedirect = True
-     , commands = [ Run Network "eno1" ["-t", "<fc=#88c0d0><fn=2> \xf0ab </fn></fc> <rx>kb <fc=#88c0d0><fn=2>\xf0aa </fn></fc> <tx>kb"] 30
+     , commands = [ Run Wireless "wlan0" ["-t", "<fc=#88c0d0><fn=2> \xf1eb  </fn></fc><essid>" ] 10
                   , Run Cpu ["-t", "<fc=#88c0d0><fn=2> \xf108 </fn></fc>  cpu:<total>%", "-H", "50", "--high", "red"] 20
                   , Run Memory ["-t","<fc=#88c0d0><fn=2> \xf233 </fn></fc>  mem: <used> MB"] 20
-                  , Run Com "uname" ["-s", "-r"] "" 36000 -- <fc=#88c0d0><fn=2>\xf17c</fn></fc>
-                  , Run Date "<fc=#88c0d0><fn=2>\xf133 </fn></fc>  %d %b %Y (%H:%M)" "date" 60 
-                  , Run UnsafeStdinReader 
+                  , Run Com "uname" ["-s", "-r"] "" 36000
+                  , Run Date "<fc=#88c0d0><fn=2>\xf133 </fn></fc>  %d %b %Y (%H:%M)" "date" 60
+                  , Run UnsafeStdinReader
+                  , Run BatteryP ["BAT0"]
+                                ["-t", "<fc=#88c0d0><fn=2>\xf581 </fn></fc>: <left>%", "-L", "10", "-H", "80", "-p", "3",
+                                 "--", "-O", "", "-i", "", "-L", "-15", "-H", "-5",
+                                 "-l", "red", "-m", "blue", "-h", "green" ] 600
+                  , Run Com "./dotfiles/.xmonad/scripts/trayer-padding-icon.sh" [] "trayerpad" 20
                   ]
      , sepChar = "%"
      , alignSep = "}{"
-     , template = "<action=`rofi -show drun`> <icon=haskell-ita.xpm/></action> <fc=#b48ead>|</fc> %UnsafeStdinReader% }{ <action=`alacritty -e sudo pacman -Syyu`><icon=linux.xpm/> %uname% </action> <fc=#b48ead>|</fc><action=`alacritty -e htop`>%cpu% </action><fc=#b48ead>|</fc><action=`alacritty -e htop`>%memory% </action><fc=#b48ead>|</fc><action=`alacritty -e nmtui`>%eno1%</action> <fc=#b48ead>|</fc><action=`alacritty -e calcurse`> %date% </action>"
+     , template = "<action=`rofi -show power-menu -modi power-menu:/home/anto/.local/bin/rofi-power-menu`> <icon=haskell-ita.xpm/> </action>  <fc=#b48ead>|</fc> %UnsafeStdinReader% }{ <action=`alacritty -e sudo pacman -Syyu`><icon=linux.xpm/>  %uname% </action> <fc=#b48ead>|</fc><action=`alacritty -e htop`>%cpu% </action><fc=#b48ead>|</fc><action=`alacritty -e htop`>%memory% </action><fc=#b48ead>|</fc><action=`alacritty -t network_manager_tui -e nmtui`>%wlan0wi%</action> <fc=#b48ead>|</fc><action=`alacritty -e calcurse`> %date% </action> <fc=#b48ead>|</fc>  %battery% "
      }

@@ -4,9 +4,18 @@ import System.Exit
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
+import qualified Data.ByteString as B
+import qualified Codec.Binary.UTF8.String as UTF8
+import qualified DBus as D
+import qualified DBus.Client as D
 
+import Control.Monad (liftM2)
+import Graphics.X11.ExtraTypes.XF86
+
+import XMonad.ManageHook
+import XMonad.Util.NamedScratchpad
 import XMonad.Util.SpawnOnce
-import XMonad.Util.Run
+import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.EZConfig
 import XMonad.Util.Replace
 
@@ -22,22 +31,16 @@ import XMonad.Actions.WithAll (sinkAll, killAll)
 import XMonad.Actions.CycleWS
 
 import XMonad.Layout.Spacing
-import XMonad.Layout.Tabbed 
+import XMonad.Layout.Tabbed
 import XMonad.Layout.NoBorders
 import XMonad.Layout.Renamed
 import XMonad.Layout.Spiral
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.MultiToggle.Instances
-import XMonad.Layout.ThreeColumns
 import XMonad.Layout.Accordion
-import XMonad.Layout.TwoPane
-import XMonad.Layout.Grid
-import XMonad.Layout.SubLayouts
 import XMonad.Layout.WindowNavigation
-import XMonad.Layout.Simplest
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.SimplestFloat
-import XMonad.Layout.Reflect
 import XMonad.Layout.LayoutCombinators -- hiding ((|||))
 import qualified XMonad.Layout.ToggleLayouts as T (toggleLayouts, ToggleLayout(Toggle))
 import XMonad.Layout.WindowArranger (windowArrange, WindowArrangerMsg(..))
@@ -47,14 +50,12 @@ import XMonad.Actions.GridSelect
 
 myTerminal         = "alacritty"
 myFallbackTerminal = "cool-retro-term"
-myLauncher         = "dmenu_run -p \"Run: \" -fn \"xft:Fira Code Retina\" -nb \"#23272e\" -nf \"#eceff4\" -sb \"#88c0d0\" -sf \"#23272e\"" 
-myLauncher2        = "rofi -show run"
-myFileManager      = "nautilus"
+myLauncher         = "rofi -modi run,drun -show drun -show-icons"
+myLauncher2        = "dmenu_run -p \"Run: \" -fn \"xft:Fira Code Retina\" -nb \"#23272e\" -nf \"#eceff4\" -sb \"#88c0d0\" -sf \"#23272e\""
+myFileManager      = "thunar"
 myBrowser          = "google-chrome-stable"
-mySecondBrowser    = "firefox"
-myEditor           = "emacs" -- maybe someday I can change it to vim, but I don't think so
-emacs              = "emacs"
-emacsFlavour       = "emacs --with-profile "
+myEditor           = "emacsclient -c" -- maybe someday I can change it to vim, but I don't think so
+emacs              = "emacsclient -c"
 emacsExec          = emacs ++ " --eval "
 
 myBorderWidth   = 2
@@ -65,7 +66,7 @@ myFocusFollowsMouse = True
 
 myModMask       = mod4Mask
 
-myWorkspaces    = map show [1..9] ++ ["10"]
+myWorkspaces    = map show [1..10]
 myWorkspaceIndices = M.fromList $ zipWith (,) myWorkspaces [1..]
 
 myNormalBorderColor  = "#2e3440"
@@ -133,22 +134,20 @@ mySysGrid = [ ("Emacs", "emacsclient -c -a emacs")
                  , ("Update AUR", "alacritty -t update-arch -e yay -Syu")
                  , ("Topgrade", "alacritty -t update-arch -e topgrade")
                  , ("XMonad Config", emacsExec ++ "'(dired \"~/.xmonad\")'")
-                 , ("Emacs Config", emacsExec ++ "'(dired \"~/.emacs.d\")'")
+                 , ("Emacs Config", emacsExec ++ "'(dired \"~/.config/doom\")'")
                  ]
 
 myAppGrid = [ ("Emacs", "emacsclient -c -a emacs")
                  , ("Vim", "alacritty -e vim")
-                 , ("Firefox", "firefox")
                  , ("Google", "google-chrome-stable")
                  , ("Spotify", "spotify")
                  , ("Teams", "teams")
                  , ("Telegram", "telegram-desktop")
                  , ("File Manager", myFileManager)
                  , ("Terminal", myTerminal)
+                 , ("Cool Terminal", myFallbackTerminal)
                  , ("Color Picker", "kcolorchooser")
                  , ("PDF reader", "okular")
-                 , ("Calculator", "qalculate-qt")
-                 , ("Typing Exercise", "ktouch")
                  ]
 
 myKeys conf@(XConfig {XMonad.modMask = modKey}) = M.fromList $
@@ -157,11 +156,12 @@ myKeys conf@(XConfig {XMonad.modMask = modKey}) = M.fromList $
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
 
 myAdditionalKeys = [ -- Basic keybindings
-                     ("M-<Return>"  , spawn $ myTerminal) 
+                     ("M-<Return>"  , spawn $ myTerminal)
+                   , ("M-S-t"       , spawn $ myFallbackTerminal)
                    , ("M1-C-t"      , spawn $ myFallbackTerminal)
                    , ("M-d"         , spawn myLauncher)
+                   , ("M-S-d"       , spawn myLauncher2)
                    , ("M-w"         , spawn myBrowser)
-                   , ("M-S-w"       , spawn mySecondBrowser)
                    , ("M-v"         , spawn "pavucontrol")
                    , ("M-S-<Return>", spawn myFileManager)
                    , ("M-S-q"       , kill)
@@ -170,8 +170,8 @@ myAdditionalKeys = [ -- Basic keybindings
                    , ("M-n"         , refresh)
                    , ("M-<Tab>"     , windows W.focusDown)
                    , ("M-S-<Tab>"   , windows W.focusUp)
-                   , ("M1-<Tab>"     , windows W.focusDown)
-                   , ("M1-S-<Tab>"   , windows W.focusUp)
+                   , ("M1-<Tab>"    , windows W.focusDown)
+                   , ("M1-S-<Tab>"  , windows W.focusUp)
                    , ("M-j"         , windows W.focusDown)
                    , ("M-k"         , windows W.focusUp)
                    , ("M-m"         , windows W.focusMaster)
@@ -193,30 +193,15 @@ myAdditionalKeys = [ -- Basic keybindings
 
                    -- Layout shortcut
                    , ("M-S-l 0"     , sendMessage $ JumpToLayout "tall")
-                   , ("M-S-l S-0"   , sendMessage $ JumpToLayout "mirrorTall")
                    , ("M-S-l a"     , sendMessage $ JumpToLayout "accordion")
-                   , ("M-S-l S-a"   , sendMessage $ JumpToLayout "wideAccordion")
                    , ("M-S-l t"     , sendMessage $ JumpToLayout "tabs")
-                   , ("M-S-l f"     , sendMessage $ JumpToLayout "monocle")
                    , ("M-S-l b"     , sendMessage $ JumpToLayout "fibonacci")
-                   , ("M-S-l g"     , sendMessage $ JumpToLayout "grid")
-                   , ("M-S-l 3"     , sendMessage $ JumpToLayout "threeCol")
-                   , ("M-S-l 2"     , sendMessage $ JumpToLayout "twoPane")
-                   , ("M-S-l S-2"   , sendMessage $ JumpToLayout "verticalTwoPane")
-                   , ("M-S-l S-f"   , sendMessage $ JumpToLayout "floats")
 
                    -- Emacs integration
                    , ("M-e"           , spawn myEditor)
                    , ("M-S-e j"       , spawn $ emacsExec ++ "'(dired nil)'" )
-                   
-                   -- Keybinds to launch app
-                   , ("M-a h"       , spawn $ myTerminal ++ " -e htop")
-                   , ("M-a u"       , spawn $ myTerminal ++ " -e sudo pacman -Syyu")
-                   , ("M-a e"       , spawn $ myTerminal ++ " -e vim")
-                   , ("M-a t"       , spawn $ "telegram-desktop")
-                   , ("M-a S-t"     , spawn $ "teams")
 
-                   -- GridSelect 
+                   -- GridSelect
                    , ("M-g g"       , goToSelected $ myGridConfig myColorizer)
                    , ("M-g a"       , spawnSelected' myAppGrid)
                    , ("M-g s"       , spawnSelected' mySysGrid)
@@ -227,6 +212,14 @@ myAdditionalKeys = [ -- Basic keybindings
                    , ("M-M1-C-S-x a", spawnSelected' myAppGrid)
                    , ("M-M1-C-S-x s", spawnSelected' mySysGrid)
                    , ("M-M1-C-S-x b", bringSelected $ myGridConfig myColorizer)
+
+                   -- Named scratchpad
+                   , ("M-s d"  , namedScratchpadAction myScratchpad  "dropdown")
+                   , ("M-s h"  , namedScratchpadAction myScratchpad  "sys_monitor")
+
+                   -- Office
+                   , ("M-p"    , spawn $ "okular")
+                   , ("M-s c", namedScratchpadAction myScratchpad  "calculator")
                    ]
 
 myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
@@ -238,32 +231,20 @@ myMouseBindings (XConfig {XMonad.modMask = modMask}) = M.fromList $
 myLayout = avoidStruts $ mouseResize $ windowArrange $ T.toggleLayouts floats
            $ mkToggle (NOBORDERS ?? FULL ?? EOT) myDefaultLayout
          where
-           myDefaultLayout = tall 
-                             ||| mirrorTall
-                             ||| threeCol
+           myDefaultLayout = tall
                              ||| tallAccordion
-                             ||| wideAccordion
-                             ||| twoPane
-                             ||| verticalTwoPane
                              ||| spirals
-                             ||| grid
                              ||| tabs
                              ||| floats
-                             ||| monocle
 
-tall = renamed [Replace "tall"] 
+tall = renamed [Replace "tall"]
        $ smartBorders
        $ spacing myGaps
---       $ reflectHoriz
        $ Tall 1 (3/100) (1/2)
 
-mirrorTall = renamed [Replace "mirrorTall"]
-           $ Mirror tall
-
-spirals = renamed [Replace "fibonacci"] 
+spirals = renamed [Replace "fibonacci"]
         $ smartBorders
-        $ addTabs shrinkText myTabTheme
-        $ spacing myGaps 
+        $ spacing myGaps
         $ spiral (6/7)
 
 tabs = renamed [Replace "tabs"]
@@ -272,57 +253,43 @@ tabs = renamed [Replace "tabs"]
 tallAccordion = renamed [Replace "accordion"]
               $ Accordion
 
-wideAccordion = renamed [Replace "wideAccordion"]
-              $ Mirror Accordion
-
-monocle = renamed [Replace "monocle"]
-        $ noBorders
-        $ addTabs shrinkText myTabTheme
-        $ limitWindows 20
-        $ Full
-
-grid = renamed [Replace "grid"]
-     $ smartBorders
-     $ limitWindows 12
-     $ spacing myGaps
-     $ mkToggle (single MIRROR)
-     $ Grid 
-
-threeCol = renamed [Replace "threeCol"]
-         $ smartBorders
-         $ limitWindows 7
---         $ reflectHoriz
-         $ ThreeCol 1 (3/100) (1/3) 
-
-twoPane = renamed [Replace "twoPane"]
-        $ smartBorders
-        $ addTabs shrinkText myTabTheme
-        $ spacing myGaps
-        $ reflectHoriz
-        $ tabs *|* TwoPane (3/100) (1/2)  
-  
-verticalTwoPane = renamed [Replace "verticalTwoPane"]
-        $ smartBorders
-        $ addTabs shrinkText myTabTheme
-        $ spacing myGaps
-        $ tabs */* TwoPane (3/100) (1/2)  
-
 floats = renamed [Replace "floats"]
        $ smartBorders
        $ limitWindows 20 simplestFloat
 
 myManageHook = composeAll . concat $
-    [ [className =? "MPlayer"          --> doFloat]
-    , [className =? "Gimp"             --> doFloat]
-    , [className =? "guake"            --> doFloat]
-    , [title     =? "update-arch"      --> doCenterFloat]
-    , [resource  =? "desktop_window"   --> doIgnore] ]
+    [ [className =? "MPlayer"             --> doFloat]
+    , [className =? "Gimp"                --> doFloat]
+    , [className =? "guake"               --> doFloat]
+    , [title     =? "update-arch"         --> doCenterFloat]
+    , [title     =? "network_manager_tui" --> doCenterFloat]
+    , [resource  =? "desktop_window"      --> doIgnore] ]
 
 myLogHook = return ()
 
 myStartupHook = do
     spawnOnce "~/.xmonad/scripts/autostart.sh"
     setWMName "LG3D"
+
+myScratchpad =[ NS "dropdown"     spawnTerm              findTerm             manageTerm,
+                NS "sys_monitor"  spawnHtop              findHtop             manageHtop,
+                NS "calculator"   officeLaunchCalculator officeFindCalculator officeManageCalculator
+              ]
+        where
+          spawnHtop              = myTerminal ++ " -t htop_term -e htop"
+          findHtop               = title =? "htop_term"
+          manageHtop             = doCenterFloat
+          spawnTerm              = myTerminal ++ " -t dropdown -e tmux "
+          findTerm               = title =? "dropdown"
+          manageTerm             = doCenterFloat
+          officeLaunchCalculator = "qalculate-gtk"
+          officeFindCalculator   = title =? "Qalculate!"
+          officeManageCalculator = doCenterFloat
+--            where
+--              h = 0.9
+--              w = 0.9
+--              t = 0.95 - h
+--              l = 0.95 - w
 
 myConfig = defaultConfig {
         terminal           = myTerminal,
@@ -337,7 +304,7 @@ myConfig = defaultConfig {
         mouseBindings      = myMouseBindings,
 
         layoutHook         = myLayout,
-        manageHook         = myManageHook <+> manageDocks,
+        manageHook         = myManageHook <+> manageDocks <+> namedScratchpadManageHook myScratchpad,
         logHook            = myLogHook,
         startupHook        = myStartupHook
     }
@@ -349,21 +316,9 @@ windowCount :: X (Maybe String)
 windowCount = gets $ Just . show . length . W.integrate' . W.stack . W.workspace . W.current . windowset
 
 main = do
-  xmproc0 <- spawnPipe "xmobar -x 0 ~/.xmonad/xmobarrc0"
---  xmproc1 <- spawnPipe "xmobar -x 1 ~/.xmonad/xmobarrc1"
+  dbus <- D.connectSession
+  D.requestName dbus (D.busName_ "org.xmonad.Log")
+      [D.nameAllowReplacement, D.nameReplaceExisting, D.nameDoNotQueue]
   xmonad $ ewmh myConfig
-    { handleEventHook = docksEventHook
-    , logHook         = dynamicLogWithPP $ xmobarPP
-                           { ppOutput          = \x -> hPutStrLn xmproc0 x -- xmobar on main monitor
- --                                                   >> hPutStrLn xmproc1 x -- xmobar on secondary monitor
-                           , ppCurrent         = xmobarColor "#c678d9" "" . wrap "[" "]"
-                           , ppVisible         = xmobarColor "#c678d9" "" . clickable
-                           , ppHidden          = xmobarColor "#b48ead" "" . wrap "*" "" . clickable
-                           , ppHiddenNoWindows = xmobarColor "#b48ead" "" . clickable
-                           , ppTitle           = xmobarColor "#CCCCCC" "" . shorten 60
-                           , ppSep             = "<fc=#88c0d0> <fn=2>|</fn> </fc>"
-                           , ppUrgent          = xmobarColor "#bf616a" "" . wrap "!" "!" 
-                           , ppExtras          = [windowCount]
-                           , ppOrder           = \(ws:l:t:ex) -> [ws,l] ++ ex ++ [t]
-                           }
+    { handleEventHook = docksEventHook <+> fullscreenEventHook
     } `additionalKeysP` myAdditionalKeys

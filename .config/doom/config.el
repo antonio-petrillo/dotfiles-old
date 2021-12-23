@@ -25,7 +25,8 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'spacemacs-dark)
+;;(setq doom-theme 'spacemacs-dark)
+(setq doom-theme 'gruber-darker)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -83,9 +84,9 @@
   (kbd "; e") 'epa-dired-do-encrypt)
 
 ;; chage font
-(setq doom-font (font-spec :family "JetBrains Mono" :size 15)
-      doom-big-font (font-spec :family "JetBrains Mono" :size 24)
-      doom-variable-pitch-font (font-spec :family "JetBrains Mono" :size 15))
+(setq doom-font (font-spec :family "JetBrains Mono Nerd Font" :size 15)
+      doom-big-font (font-spec :family "JetBrains Mono Nerd Font" :size 24)
+      doom-variable-pitch-font (font-spec :family "JetBrains Mono Nerd Font" :size 15))
 
 ;; org roam
 (use-package! org-roam

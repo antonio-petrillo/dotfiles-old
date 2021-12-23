@@ -113,7 +113,7 @@ font:
     # family: CodeNewRoman Nerd Font
     # family: RobotoMono Nerd Font
     # family: Hack
-    family: JetBrains Mono
+    family: JetBrains Mono Nerd Font Mono
     # family: UbuntuMono Nerd Font
     # family: Monofur Nerd Font
     # family: TerminessTTF Nerd Font
@@ -132,7 +132,7 @@ font:
     # family: CodeNewRoman Nerd Font
     # family: RobotoMono Nerd Font
     # family: Hack
-    family: JetBrains Mono
+    family: JetBrains Mono Nerd Font Mono
     # family: UbuntuMono Nerd Font
     # family: Monofur Nerd Font
     # family: TerminessTTF Nerd Font
@@ -151,7 +151,7 @@ font:
     # family: CodeNewRoman Nerd Font
     # family: RobotoMono Nerd Font
     # family: Hack
-    family: JetBrains Mono
+    family: JetBrains Mono Nerd Font Mono
     # family: UbuntuMono Nerd Font
     # family: Monofuritalic Nerd Font Mono
     # family: TerminessTTF Nerd Font
@@ -170,7 +170,7 @@ font:
     # family: CodeNewRoman Nerd Font
     # family: RobotoMono Nerd Font
     # family: Hack
-    family: JetBrains Mono
+    family: JetBrains Mono Nerd Font Mono
     # family: UbuntuMono Nerd Font
     # family: Monofuritalic Nerd Font Mono
     # family: TerminessTTF Nerd Font
@@ -474,7 +474,7 @@ schemes:
 # *solarized-light
 # *solarized-dark
 # *tomorrow-night
-colors: *gruvbox-dark
+  colors: *doom-one
 
 # Visual Bell
 #

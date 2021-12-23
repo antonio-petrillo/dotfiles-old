@@ -7,28 +7,26 @@ function run {
   fi
 }
 
-#change your keyboard if you need it
-#setxkbmap -layout be
-
 # set screen layout
-# ~/dotfiles/script/screen-setup.sh 
+~/dotfiles/script/screen-setup.sh
 #cursor active at boot
 xsetroot -cursor_name left_ptr &
 
-run nm-applet &
-run pamac-tray &
-run xfce4-power-manager &
-run volumeicon &
-numlockx on &
-blueberry-tray &
-picom --config $HOME/.xmonad/scripts/picom.conf &
+dunst -conf $HOME/.config/dunst/dunstrc &
+xmodmap $HOME/dotfiles/script/.Xmodmap
+xfce4-power-manager &
+picom &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
-/usr/lib/xfce4/notifyd/xfce4-notifyd &
 udiskie &
+$HOME/dotfiles/script/screen-setup.sh
+# stalonetray -c $HOME/.config/stalonetray/main_stalonetrayrc &
+# stalonetray -c $HOME/.config/stalonetray/secondary_stalonetrayrc &
+$HOME/.config/polybar/launch.sh
+
+nm-applet &
+volumeicon &
+blueman-applet &
 
 #starting user applications at boot time
 nitrogen --restore &
-emacs --daemon 
-trayer --edge top --align right --widthtype request --padding 8 --SetDockType true --SetPartialStrut true --expand true --transparent true --alpha 0 --tint 0x23272e  --height 22 &
-yakuake &
-play-with-mpv &
+emacs --daemon &
