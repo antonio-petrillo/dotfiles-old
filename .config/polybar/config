@@ -1,7 +1,7 @@
 [colors]
 background = #23272e
 background-alt = #282c34
-foreground = #528bff
+foreground = #ebebec
 foreground-alt = #c0c3c7
 primary = #1f222d
 secondary = #ff6200
@@ -182,7 +182,7 @@ format-prefix-foreground = ${colors.foreground-alt}
 
 [module/wireless-network]
 type = internal/network
-interface = wlp4s0
+interface = wlan0
 interval = 3.0
 ping-interval = 10
 

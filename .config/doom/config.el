@@ -108,6 +108,74 @@
  :desc "Open vterm popup buffer"
  "<C-f12>" #'+vterm/toggle)
 
+;; keybindings to eval s-exp
+(map! :leader
+      (:prefix-map ("e" . "eval s-exp")
+       :desc "eval s-expression" "e" #'eval-last-sexp
+       :desc "eval region" "r" #'eval-region
+       :desc "eval buffer" "b" #'eval-buffer
+       :desc "just for hydra test" "t" #'nto-test/body))
+
+;; window management with hydra
+;; inspired/borrowed from [[https://github.com/jakebox/jake-emacs][JakeB]]  --> for the future literate config
+
+(general-define-key "s-o" 'nto/hydra-window-management/body)
+
+(defhydra nto/hydra-window-management (:pre (message "window management")
+                                       :color pink
+                                       :hint nil
+                                       :post (message "bye bye"))
+
+  "basic window management with hydra (what an awesome package!)"
+
+  ;; quit wm mode
+  ("q" nil "exit" :color blue)
+
+  ;; buffer & file
+  ("b" consult-buffer "switch buffer")
+  ("[" previous-buffer "previous buffer")
+  ("]" next-buffer "next buffer")
+  ("K" kill-this-buffer "kill current buffer")
+  ("C-k" kill-buffer "kill current buffer")
+  ("f" find-file "find file")
+
+  ;; window size
+  ("=" evil-window-increase-height "increase height") ;; = so I don't need to use shift
+  ("-" evil-window-decrease-height "decrease height")
+  ("." evil-window-increase-width "increase width")
+  ("," evil-window-decrease-width "increase width")
+  ("e" balance-window "balance window")
+
+  ;; split & swap
+  ("c" evil-window-delete "close window")
+  ("d" evil-window-delete "close window")
+  ("S" ace-swap-window "swap current window")
+  ("v" evil-window-vsplit "vertical split")
+  ("s" evil-window-split "horizontal split")
+
+  ;; split, then open app
+  ("t" nto/open-terminal-vertical "open terminal vertically")
+  ("T" nto/open-terminal-horizontal "open terminal horizontally")
+
+  ;; movement
+  ("h" evil-window-left "go left")
+  ("j" evil-window-down "go down")
+  ("k" evil-window-up "go up")
+  ("l" evil-window-right "go right"))
+
+;; for me the split-window-vertically & split-window-horizontally don't make sense, so I have inverted them
+(defun nto/open-terminal-horizontal ()
+  (interactive)
+  (split-window-vertically)
+  (other-window 1)
+  (eshell))
+
+(defun nto/open-terminal-vertical ()
+  (interactive)
+  (split-window-horizontally)
+  (other-window 1)
+  (eshell))
+
 ;; make org pretty
 (setq org-ellipsis " ▾")
 (setq org-startup-folded t)
