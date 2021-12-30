@@ -121,49 +121,67 @@
 
 (general-define-key "s-o" 'nto/hydra-window-management/body)
 
+;;  basic window management with hydra (what an awesome package!)
+;;  TODO integrate (or improve):
+;;  + ace window
+;;  + edwina
+;;  + eyebrowse
+;;  + avy
+;;  + other basic app
+
 (defhydra nto/hydra-window-management (:pre (message "window management")
                                        :color pink
                                        :hint nil
                                        :post (message "bye bye"))
-
-  "basic window management with hydra (what an awesome package!)"
+  "
+Movement^^      ^Split^         ^Switch^                ^Resize^                ^Action^
+----------------------------------------------------------------------------------------
+_h_ ←           _v_ertical      _b_uffer                _=_  H ↑                _q_uit
+_j_ ↓           _s_ horizontal  _f_ind files            _-_  H ↓                _t_erminal v
+_k_ ↑           _d_ delete      _[_ next buffer         _._  W →                _T_erminal h
+_l_ →           _c_ delete      _]_ prev buffer         _,_  W ←
+^ ^             ^ ^             _C-k_ kill buffer       _e_ balance window
+^ ^             ^ ^             _K_ kill this buffer    ^ ^
+"
 
   ;; quit wm mode
-  ("q" nil "exit" :color blue)
+  ("q" nil :color blue)
 
   ;; buffer & file
-  ("b" consult-buffer "switch buffer")
-  ("[" previous-buffer "previous buffer")
-  ("]" next-buffer "next buffer")
-  ("K" kill-this-buffer "kill current buffer")
-  ("C-k" kill-buffer "kill current buffer")
-  ("f" find-file "find file")
+  ("b" consult-buffer)
+  ("[" previous-buffer)
+  ("]" next-buffer)
+  ("K" kill-this-buffer)
+  ("C-k" kill-buffer)
+  ("f" find-file)
 
   ;; window size
-  ("=" evil-window-increase-height "increase height") ;; = so I don't need to use shift
-  ("-" evil-window-decrease-height "decrease height")
-  ("." evil-window-increase-width "increase width")
-  ("," evil-window-decrease-width "increase width")
-  ("e" balance-window "balance window")
+  ("=" evil-window-increase-height) ;; = so I don't need to use shift
+  ("-" evil-window-decrease-height)
+  ("." evil-window-increase-width)
+  ("," evil-window-decrease-width)
+  ("e" balance-windows)
 
   ;; split & swap
-  ("c" evil-window-delete "close window")
-  ("d" evil-window-delete "close window")
-  ("S" ace-swap-window "swap current window")
-  ("v" evil-window-vsplit "vertical split")
-  ("s" evil-window-split "horizontal split")
+  ("c" evil-window-delete)
+  ("d" evil-window-delete)
+  ("S" ace-swap-window)
+  ("v" evil-window-vsplit)
+  ("s" evil-window-split)
 
   ;; split, then open app
-  ("t" nto/open-terminal-vertical "open terminal vertically")
-  ("T" nto/open-terminal-horizontal "open terminal horizontally")
+  ;; I could have used progn or lambda, but this is cleaner
+  ("t" nto/open-terminal-vertical)
+  ("T" nto/open-terminal-horizontal)
 
   ;; movement
-  ("h" evil-window-left "go left")
-  ("j" evil-window-down "go down")
-  ("k" evil-window-up "go up")
-  ("l" evil-window-right "go right"))
+  ("h" evil-window-left)
+  ("j" evil-window-down)
+  ("k" evil-window-up)
+  ("l" evil-window-right))
 
 ;; for me the split-window-vertically & split-window-horizontally don't make sense, so I have inverted them
+;; they don't work as I expected!
 (defun nto/open-terminal-horizontal ()
   (interactive)
   (split-window-vertically)
@@ -187,5 +205,7 @@
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
 ;; transparent background;; set transparency
-(set-frame-parameter (selected-frame) 'alpha '(85 85))
-(add-to-list 'default-frame-alist '(alpha 85 85))
+;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
+;; (add-to-list 'default-frame-alist '(alpha 85 85))
+(set-frame-parameter (selected-frame) 'alpha '(100 100))
+(add-to-list 'default-frame-alist '(alpha 100 100))
