@@ -53,4 +53,4 @@
 (package! dired-hide-dotfiles)
 (package! gruber-darker-theme)
 (package! spacemacs-theme)
-(package! org-roam)
+(package! org-appear)

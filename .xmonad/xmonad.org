@@ -63,7 +63,7 @@ myFileManager      = "thunar"
 myBrowser          = "google-chrome-stable"
 myEditor           = "emacsclient -c" -- maybe someday I can change it to vim, but I don't think so
 emacs              = "emacsclient -c"
-emacsExec          = emacs ++ " --eval "
+emacsExec          = "emacsclient --eval "
 #+end_src
 * My window manager parameter
 ** System parameter
@@ -213,7 +213,7 @@ myAdditionalKeys = [ -- Basic keybindings
 
                    -- Emacs integration
                    , ("M-e"           , spawn myEditor)
-                   , ("M-S-e j"       , spawn $ emacsExec ++ "'(dired nil)'" )
+                   , ("M-S-e"         , spawn $ emacsExec ++ "\"(emacs-everywhere)\"")
 
                    -- GridSelect
                    , ("M-g g"       , goToSelected $ myGridConfig myColorizer)

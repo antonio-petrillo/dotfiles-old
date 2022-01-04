@@ -56,7 +56,7 @@ myFileManager      = "thunar"
 myBrowser          = "google-chrome-stable"
 myEditor           = "emacsclient -c" -- maybe someday I can change it to vim, but I don't think so
 emacs              = "emacsclient -c"
-emacsExec          = emacs ++ " --eval "
+emacsExec          = "emacsclient --eval "
 
 myBorderWidth   = 2
 myGaps          = 2
@@ -199,7 +199,7 @@ myAdditionalKeys = [ -- Basic keybindings
 
                    -- Emacs integration
                    , ("M-e"           , spawn myEditor)
-                   , ("M-S-e j"       , spawn $ emacsExec ++ "'(dired nil)'" )
+                   , ("M-S-e"         , spawn $ emacsExec ++ "\"(emacs-everywhere)\"")
 
                    -- GridSelect
                    , ("M-g g"       , goToSelected $ myGridConfig myColorizer)
@@ -263,6 +263,7 @@ myManageHook = composeAll . concat $
     , [className =? "guake"               --> doFloat]
     , [title     =? "update-arch"         --> doCenterFloat]
     , [title     =? "network_manager_tui" --> doCenterFloat]
+    , [title     =? "Emacs Everywhere.*"    --> doCenterFloat]
     , [resource  =? "desktop_window"      --> doIgnore] ]
 
 myLogHook = return ()

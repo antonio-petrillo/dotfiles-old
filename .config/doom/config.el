@@ -30,7 +30,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Documents/org/")
+(setq org-directory "~/Documents/Org/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -88,33 +88,17 @@
       doom-big-font (font-spec :family "JetBrains Mono Nerd Font" :size 24)
       doom-variable-pitch-font (font-spec :family "JetBrains Mono Nerd Font" :size 15))
 
-;; org roam
-(use-package! org-roam
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory "~/Documents/Org/Roam")
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert))
-  :config
-  (org-roam-setup))
-
 ;; use trash can in dired
 (setq delete-by-moving-to-trash t)
 
-;; keybindings to open vterm popup (SPC o t is a little bit annoying because I need to be in normal mode)
-(map!
- :desc "Open vterm popup buffer"
- "<C-f12>" #'+vterm/toggle)
 
 ;; keybindings to eval s-exp
 (map! :leader
       (:prefix-map ("e" . "eval s-exp")
        :desc "eval s-expression" "e" #'eval-last-sexp
        :desc "eval region" "r" #'eval-region
-       :desc "eval buffer" "b" #'eval-buffer
-       :desc "just for hydra test" "t" #'nto-test/body))
+       :desc "eval defun" "d" #'eval-defun
+       :desc "eval buffer" "b" #'eval-buffer))
 
 ;; window management with hydra
 ;; inspired/borrowed from [[https://github.com/jakebox/jake-emacs][JakeB]]  --> for the future literate config
@@ -126,7 +110,6 @@
 ;;  + ace window
 ;;  + edwina
 ;;  + eyebrowse
-;;  + avy
 ;;  + other basic app
 
 (defhydra nto/hydra-window-management (:pre (message "window management")
@@ -136,19 +119,18 @@
   "
 Movement^^      ^Split^         ^Switch^                ^Resize^                ^Action^
 ----------------------------------------------------------------------------------------
-_h_ ←           _v_ertical      _b_uffer                _=_  H ↑                _q_uit
-_j_ ↓           _s_ horizontal  _f_ind files            _-_  H ↓                _t_erminal v
-_k_ ↑           _d_ delete      _[_ next buffer         _._  W →                _T_erminal h
-_l_ →           _c_ delete      _]_ prev buffer         _,_  W ←
+_h_ ← _H_ ← m   _v_ertical      _b_uffer                _=_  H ↑                _q_uit
+_j_ ↓ _J_ ↓ m   _s_ horizontal  _f_ind files            _-_  H ↓                _t_erminal v
+_k_ ↑ _K_ ↑ m   _d_ delete      _[_ next buffer         _._  W →                _T_erminal h
+_l_ → _L_ → m   _c_ delete      _]_ prev buffer         _,_  W ←
 ^ ^             ^ ^             _C-k_ kill buffer       _e_ balance window
 ^ ^             ^ ^             _K_ kill this buffer    ^ ^
 "
 
   ;; quit wm mode
   ("q" nil :color blue)
-
   ;; buffer & file
-  ("b" consult-buffer)
+  ( "b" consult-buffer)
   ("[" previous-buffer)
   ("]" next-buffer)
   ("K" kill-this-buffer)
@@ -176,9 +158,13 @@ _l_ →           _c_ delete      _]_ prev buffer         _,_  W ←
 
   ;; movement
   ("h" evil-window-left)
+  ("H" +evil/window-move-left)
   ("j" evil-window-down)
+  ("J" +evil/window-move-down)
   ("k" evil-window-up)
-  ("l" evil-window-right))
+  ("K" +evil/window-move-up)
+  ("l" evil-window-right)
+  ("L" +evil/window-move-right))
 
 ;; for me the split-window-vertically & split-window-horizontally don't make sense, so I have inverted them
 ;; they don't work as I expected!
@@ -194,6 +180,16 @@ _l_ →           _c_ delete      _]_ prev buffer         _,_  W ←
   (other-window 1)
   (eshell))
 
+;; battery in modeline
+(display-battery-mode)
+
+;; jumping around in the file with hydra ;; maybe bind M-j
+(map! :leader
+      (:prefix-map ("j" . "jumping around")
+       :desc "multi-char" "j" #'avy-goto-char-timer
+       :desc "char" "J" #'avy-goto-char
+       :desc "2char" "c" #'avy-goto-char-2))
+
 ;; make org pretty
 (setq org-ellipsis " ▾")
 (setq org-startup-folded t)
@@ -204,8 +200,38 @@ _l_ →           _c_ delete      _]_ prev buffer         _,_  W ←
   :config
   (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
-;; transparent background;; set transparency
-;; (set-frame-parameter (selected-frame) 'alpha '(85 85))
-;; (add-to-list 'default-frame-alist '(alpha 85 85))
-(set-frame-parameter (selected-frame) 'alpha '(100 100))
-(add-to-list 'default-frame-alist '(alpha 100 100))
+(setq transparency 't
+      transparency-level 85)
+
+(defun nto/toggle-transparency ()
+  "change transparency"
+  (interactive)
+  (if (eq transparency t)
+      (progn
+        (set-frame-parameter (selected-frame) 'alpha (list transparency-level transparency-level))
+        (message "transparency on")
+        (setq transparency nil))
+    (set-frame-parameter (selected-frame) 'alpha '(100 100))
+    (message "transparency off")
+    (setq transparency t)))
+
+;; my toggle
+(map! :leader
+      (:prefix-map ("T" . "myToggle")
+       :desc "transparency" "t" #'nto/toggle-transparency))
+
+;; TODO other toggle:
+;; + toggle light/dark theme
+;; + boh
+
+;; elfeed config
+(after! elfeed
+  (add-hook! 'elfeed-search-mode-hook #'elfeed-update)
+  (setq elfeed-search-filter "@1-month-ago +unread"))
+
+;;(setq rmh-elfeed-org-files '("~/Documents/Org/elfeed.org"))
+;; try elfeed-goodies
+
+;; perspective in modeline
+(setq doom-modeline-persp-icon t
+      doom-modeline-persp-name t)
