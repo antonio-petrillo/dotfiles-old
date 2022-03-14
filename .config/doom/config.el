@@ -26,7 +26,8 @@
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 ;;(setq doom-theme 'spacemacs-dark)
-(setq doom-theme 'gruber-darker)
+;;(setq doom-theme 'gruber-darker)
+(setq doom-theme 'doom-one)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -204,7 +205,7 @@ _l_ → _L_ → m   _c_ delete      _]_ prev buffer         _,_  W ←
       transparency-level 85)
 
 (defun nto/toggle-transparency ()
-  "change transparency"
+  "toggle transparency"
   (interactive)
   (if (eq transparency t)
       (progn
@@ -231,7 +232,3 @@ _l_ → _L_ → m   _c_ delete      _]_ prev buffer         _,_  W ←
 
 ;;(setq rmh-elfeed-org-files '("~/Documents/Org/elfeed.org"))
 ;; try elfeed-goodies
-
-;; perspective in modeline
-(setq doom-modeline-persp-icon t
-      doom-modeline-persp-name t)

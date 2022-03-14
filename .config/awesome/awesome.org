@@ -1,0 +1,12 @@
+#+TITLE: Awesome WM config
+* Intro
+There is a lot of staff todo, but for now I just need to save my dots
+
+* Dependencies
+| Package                                 | AUR                     | Base | Github       |
+|-----------------------------------------+-------------------------+------+--------------|
+| lain                                    | lain-git                |      |              |
+| freedesktop                             | awesome-freedesktop-git |      |              |
+| awesome-wm-widget                       |                         |      | [[https://github.com/streetturtle/awesome-wm-widgets.git][streetturtle]] |
+| json.lua                                |                         |      | [[https://github.com/rxi/json.lua.git][rxi]]          |
+| catppuccin (gtk, sddm, icon, alacritty) |                         |      | [[https://github.com/catppuccin/catppuccin.git][catpuccin]]    |
